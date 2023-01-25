@@ -19,10 +19,10 @@ from scipy import optimize
 import pymc3 as pm
 import pandas as pd
 
-##### INITIAL PARSING + GETTING READS #####
+# #### INITIAL PARSING + GETTING READS #####
 
-#import dill
-#dill.load_session('globalsave.pkl')
+# import dill
+# dill.load_session('globalsave.pkl')
 
 def JunctionBam_SE(bam, outfile):
     bamname = bam[:-4]
@@ -138,7 +138,7 @@ def getExonReads(juncbam, overlap):
             readenddict[exon][bedline[3]] = readend
     return(readstartdict, readenddict)
 
-##### HIT INDEX FUNCTION #####
+# #### HIT INDEX FUNCTION #####
 
 def calculateMetric(beddict, startdict, enddict, readnum):
 	#rows = []
@@ -178,7 +178,7 @@ def calculateMetric(beddict, startdict, enddict, readnum):
 	#return(beddict, df)
 	return(beddict)
 
-##### GENERATIVE MODEL FUNCTIONS #####
+# #### GENERATIVE MODEL FUNCTIONS #####
 
 def classify_observations(N, D, k, omega):
 	omega = omega[:-1]
@@ -303,7 +303,7 @@ def running_genmodel(exon_outname):
 
 	return(df_exon)
 
-##### DOWNSTREAM PROCESSING #####
+# #### DOWNSTREAM PROCESSING #####
 
 def piecewise_linear(x, x0, y0, k1, k2): 
 	return np.piecewise(x, [x < x0, x >= x0], [lambda x:k1*x + y0-k1*x0, lambda x:k2*x + y0-k2*x0])
@@ -372,7 +372,7 @@ def writeMetrics(HITdict, param, outname):
     			str(HITdict[gene][exon]['startdistance']) +'\t'+ str(HITdict[gene][exon]['enddistance']) +'\t'+ edge +'\n')
     outexon.close()
 
-##### IDENTIFY TERMINAL EXONS #####
+# #### IDENTIFY TERMINAL EXONS #####
 
 def readMetrics(metrics):
 	df = pd.read_csv(metrics, sep='\t')
@@ -477,7 +477,7 @@ def call_terminal(HITcombo, paramdict, outname):
 	HITcombo.to_csv(outname, sep='\t', index=False)	
 	#return()
 
-##### CALCULATE PSI #####
+# #### CALCULATE PSI #####
 
 def calculatePSI(HITidentify, edge, outname):
 	afepsidata = []
@@ -525,39 +525,39 @@ def calculatePSI(HITidentify, edge, outname):
 	alepsidata = pd.concat(alepsidata, ignore_index=True)
 	alepsidata.to_csv(outALE, sep='\t', index=False)	
 
-if __name__ == '__main__':
-	parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-                                     description='Classify and quantify exons from a bam file.', add_help = True)
-	parser.add_argument('--junctionReads', action='store_true', default=False, help='Extract junction reads', required = False)
-	parser.add_argument('--HITindex', action='store_true', default=False, help='Calculate HITindex', required = False)
-	parser.add_argument('--classify', action = 'store_true', help='Classify terminal, hybrid, and internal exons', required = False)
-	parser.add_argument('--calculatePSI', action = 'store_true', help='Calculate PSI values', required = False)
-	parser.add_argument('--outname', type=str, metavar='', help='name of file(s) for final metric. required for everything except --junctionReads.', required=False)
-	### read information
-	group_reads = parser.add_argument_group('read information')
-	group_reads.add_argument('--bam', type = str, metavar='', help = 'original bam from which to extract junction reads. required if --junctionReads', required=False, default="None")
-	group_reads.add_argument('--juncbam', type = str, metavar='', help = 'junction read bam. required if --junctionReads or --HITindex', required = False, default = "None")
-	group_reads.add_argument('--readtype', type=str, help = 'type of read', default='paired', required=False, choices=['single','paired'])
-	group_reads.add_argument('--readstrand', type=str, help = 'directionality of RNA-seq data', default='fr-firststrand', required=False, choices=['fr-unstrand','fr-firststrand','fr-secondstrand'])
-	### exon information
-	group_exons = parser.add_argument_group('exon information')
-	group_exons.add_argument('--bed', type = str, metavar='', help = 'bed file with merged/annotated exons. Output from HITindex_annotate.py. required if --HITindex', required = False, default = "None")
-	## HITindex parameters
-	group_param = parser.add_argument_group('HITindex', 'parameters for running HIT index')
-	group_param.add_argument('--overlap', type = int, metavar='', help = 'overlap of split read with exon region (nt)', required = False, default = 10)
-	group_param.add_argument('--readnum', type = int, metavar='', help = 'minimum number of reads for confidence in HITindex (sum of R + L)', required = False, default = 2)
-	### thresholds for calling terminal exons
-	group_term = parser.add_argument_group('classify', 'information for classifying exon types') 
-	group_term.add_argument('--metrics', metavar='', type = str, help = 'HITindex output file, required if --HITindex is not specified.', required = False, default = "None")
-	group_term.add_argument('--parameters', metavar='', type = str, help = 'file specifying HITindex and generative model thresholds for classifying exons.', required=False, default="HIT_identity_parameters.txt")
-	group_term.add_argument('--bootstrap', type = int, metavar='', help = 'bootstrapping iterations to get confidence intervals and p-values', required = False, default = 1000)
-	### PSI values
-	group_psi = parser.add_argument_group('psi', 'parameters for calling PSI values')
-	group_psi.add_argument('--metricsID', type = str, metavar='', help = 'HITindex identification output file, required if --classify is not specified.', required = False, default = "None")
-	group_psi.add_argument('--edge', type = bool, metavar='', help = 'exclude exons flagged as being affected by the edge effect from PSI calculations', required = False, default = False)
-	# confidence information
-	args = parser.parse_args()
-
+# if __name__ == '__main__':
+	# parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+	# description='Classify and quantify exons from a bam file.', add_help = True)
+	# parser.add_argument('--junctionReads', action='store_true', default=False, help='Extract junction reads', required = False)
+	# parser.add_argument('--HITindex', action='store_true', default=False, help='Calculate HITindex', required = False)
+	# parser.add_argument('--classify', action = 'store_true', help='Classify terminal, hybrid, and internal exons', required = False)
+	# parser.add_argument('--calculatePSI', action = 'store_true', help='Calculate PSI values', required = False)
+	# parser.add_argument('--outname', type=str, metavar='', help='name of file(s) for final metric. required for everything except --junctionReads.', required=False)
+	# ### read information
+	# group_reads = parser.add_argument_group('read information')
+	# group_reads.add_argument('--bam', type = str, metavar='', help = 'original bam from which to extract junction reads. required if --junctionReads', required=False, default="None")
+	# group_reads.add_argument('--juncbam', type = str, metavar='', help = 'junction read bam. required if --junctionReads or --HITindex', required = False, default = "None")
+	# group_reads.add_argument('--readtype', type=str, help = 'type of read', default='paired', required=False, choices=['single','paired'])
+	# group_reads.add_argument('--readstrand', type=str, help = 'directionality of RNA-seq data', default='fr-firststrand', required=False, choices=['fr-unstrand','fr-firststrand','fr-secondstrand'])
+	# ### exon information
+	# group_exons = parser.add_argument_group('exon information')
+	# group_exons.add_argument('--bed', type = str, metavar='', help = 'bed file with merged/annotated exons. Output from HITindex_annotate.py. required if --HITindex', required = False, default = "None")
+	# ## HITindex parameters
+	# group_param = parser.add_argument_group('HITindex', 'parameters for running HIT index')
+	# group_param.add_argument('--overlap', type = int, metavar='', help = 'overlap of split read with exon region (nt)', required = False, default = 10)
+	# group_param.add_argument('--readnum', type = int, metavar='', help = 'minimum number of reads for confidence in HITindex (sum of R + L)', required = False, default = 2)
+	# ### thresholds for calling terminal exons
+	# group_term = parser.add_argument_group('classify', 'information for classifying exon types') 
+	# group_term.add_argument('--metrics', metavar='', type = str, help = 'HITindex output file, required if --HITindex is not specified.', required = False, default = "None")
+	# group_term.add_argument('--parameters', metavar='', type = str, help = 'file specifying HITindex and generative model thresholds for classifying exons.', required=False, default="HIT_identity_parameters.txt")
+	# group_term.add_argument('--bootstrap', type = int, metavar='', help = 'bootstrapping iterations to get confidence intervals and p-values', required = False, default = 1000)
+	# ### PSI values
+	# group_psi = parser.add_argument_group('psi', 'parameters for calling PSI values')
+	# group_psi.add_argument('--metricsID', type = str, metavar='', help = 'HITindex identification output file, required if --classify is not specified.', required = False, default = "None")
+	# group_psi.add_argument('--edge', type = bool, metavar='', help = 'exclude exons flagged as being affected by the edge effect from PSI calculations', required = False, default = False)
+	# # confidence information
+	# args = parser.parse_args()
+def main(args):
 	if not args.junctionReads and not args.HITindex and not args.classify and not args.calculatePSI:
 		sys.exit("ERROR! Need to include at least one function: --junctionReads, --HITindex, --classify, and/or --calculatePSI")
 
